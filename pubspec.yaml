@@ -1,7 +1,7 @@
 name: anime_tracker
-description: "Anime Tracker app."
+description: "An app for recording your anime. Add tags and links to websites for viewing."
 publish_to: 'none'
-version: 1.2.0+1
+version: 2.0.0+3
 
 environment:
   sdk: ^3.11.1
@@ -17,6 +17,7 @@ dependencies:
   url_launcher: ^6.2.0
   path_provider: ^2.1.0
   share_plus: ^10.0.0
+  yaml: ^3.1.2
 
 dev_dependencies:
   flutter_test:
@@ -35,3 +36,16 @@ flutter:
   uses-material-design: true
   assets:
     - assets/icon.png
+    - assets/l10n/ru.yaml
+    - assets/l10n/en.yaml
+    - assets/l10n/ua.yaml
+    - assets/l10n/de.yaml
+    - assets/l10n/fr.yaml
+    - assets/l10n/es.yaml
+    - assets/l10n/ja.yaml
+    - assets/l10n/zh.yaml
+    - assets/l10n/pt.yaml
+    - assets/l10n/ko.yaml
+    - assets/l10n/it.yaml
+    - assets/l10n/nl.yaml
+    

@@ -1,0 +1,67 @@
+app_title: Anime Tracker
+
+nav_anime: Аніме
+nav_tags: Теги
+nav_settings: Налаштування
+
+list_empty: Список порожній
+list_nothing_found: Нічого не знайдено
+search_hint: Пошук...
+tooltip_export: Експорт
+tooltip_import: Імпорт
+export_done: Експорт виконано
+import_done: Імпорт виконано (об'єднання)
+
+detail_tags: Теги
+detail_description: Опис
+detail_note: Нотатка
+detail_links: Посилання
+detail_added: Додано
+delete_confirm_title: Видалити?
+delete_confirm_body: "буде видалено."
+
+edit_new_anime: Нове аніме
+edit_edit_anime: Редагувати
+edit_add_image: Додати зображення
+edit_change_image: Змінити
+edit_field_title: Назва *
+edit_field_desc: Опис
+edit_field_note: Нотатка
+edit_tags: Теги
+edit_buttons: Кнопки-посилання
+edit_add_button: Додати
+btn_cancel: Скасувати
+btn_add: Додати
+btn_save: Зберегти
+btn_delete: Видалити
+
+tag_new: Новий тег
+tag_edit: Редагувати тег
+tag_name: Назва тега
+tag_color: Колір
+tags_empty: Немає тегів
+
+btn_editor_new: Нова кнопка
+btn_editor_edit: Редагувати кнопку
+btn_editor_label: Текст кнопки
+btn_editor_url: "URL (https://...)"
+btn_editor_color: Колір
+
+settings_title: Налаштування
+settings_language: Мова
+settings_about: Про застосунок
+settings_made_by: "Made by Alx0rr"
+settings_github: https://github.com/alx0rr/anime-tracker
+
+settings_lang_en: English
+settings_lang_ru: Русский
+settings_lang_de: Deutsch
+settings_lang_fr: Français
+settings_lang_es: Español
+settings_lang_ja: 日本語
+settings_lang_zh: 中文
+settings_lang_pt: Português
+settings_lang_ko: 한국어
+settings_lang_it: Italiano
+settings_lang_nl: Nederlands
+settings_lang_ua: Українська

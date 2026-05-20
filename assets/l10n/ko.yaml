@@ -1,0 +1,60 @@
+app_title: 애니메이션 트래커
+nav_anime: 애니메이션
+nav_tags: 태그
+nav_settings: 설정
+list_empty: 목록이 비어 있습니다
+list_nothing_found: 결과 없음
+search_hint: 검색...
+tooltip_export: 내보내기
+tooltip_import: 가져오기
+export_done: 내보내기 완료
+import_done: "가져오기 완료 (병합됨)"
+detail_tags: 태그
+detail_description: 설명
+detail_note: 메모
+detail_links: 링크
+detail_added: 추가된 날짜
+delete_confirm_title: "삭제하시겠습니까?"
+delete_confirm_body: "이(가) 삭제됩니다."
+edit_new_anime: 새 애니메이션
+edit_edit_anime: 편집
+edit_add_image: 이미지 추가
+edit_change_image: 변경
+edit_field_title: "제목 *"
+edit_field_desc: 설명
+edit_field_note: 메모
+edit_tags: 태그
+edit_buttons: 링크 버튼
+edit_add_button: 추가
+btn_cancel: 취소
+btn_add: 추가
+btn_save: 저장
+btn_delete: 삭제
+tag_new: 새 태그
+tag_edit: 태그 편집
+tag_name: 태그 이름
+tag_color: 색상
+tags_empty: 태그 없음
+btn_editor_new: 새 버튼
+btn_editor_edit: 버튼 편집
+btn_editor_label: 버튼 레이블
+btn_editor_url: "URL (https://...)"
+btn_editor_color: 색상
+settings_title: 설정
+settings_language: 언어
+settings_about: 정보
+settings_made_by: "Made by Alx0rr"
+settings_github: https://github.com/alx0rr/anime-tracker
+
+settings_lang_en: English
+settings_lang_ru: Русский
+settings_lang_de: Deutsch
+settings_lang_fr: Français
+settings_lang_es: Español
+settings_lang_ja: 日本語
+settings_lang_zh: 中文
+settings_lang_pt: Português
+settings_lang_ko: 한국어
+settings_lang_it: Italiano
+settings_lang_nl: Nederlands
+settings_lang_ua: Українська

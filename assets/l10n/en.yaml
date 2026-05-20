@@ -1,0 +1,67 @@
+app_title: Anime Tracker
+
+nav_anime: Anime
+nav_tags: Tags
+nav_settings: Settings
+
+list_empty: List is empty
+list_nothing_found: Nothing found
+search_hint: Search...
+tooltip_export: Export
+tooltip_import: Import
+export_done: Export complete
+import_done: Import complete (merged)
+
+detail_tags: Tags
+detail_description: Description
+detail_note: Note
+detail_links: Links
+detail_added: Added
+delete_confirm_title: Delete?
+delete_confirm_body: "will be deleted."
+
+edit_new_anime: New anime
+edit_edit_anime: Edit
+edit_add_image: Add image
+edit_change_image: Change
+edit_field_title: Title *
+edit_field_desc: Description
+edit_field_note: Note
+edit_tags: Tags
+edit_buttons: Link buttons
+edit_add_button: Add
+btn_cancel: Cancel
+btn_add: Add
+btn_save: Save
+btn_delete: Delete
+
+tag_new: New tag
+tag_edit: Edit tag
+tag_name: Tag name
+tag_color: Color
+tags_empty: No tags
+
+btn_editor_new: New button
+btn_editor_edit: Edit button
+btn_editor_label: Button label
+btn_editor_url: "URL (https://...)"
+btn_editor_color: Color
+
+settings_title: Settings
+settings_language: Language
+settings_about: About
+settings_made_by: "Made by Alx0rr"
+settings_github: https://github.com/alx0rr/anime-tracker
+
+settings_lang_en: English
+settings_lang_ru: Русский
+settings_lang_de: Deutsch
+settings_lang_fr: Français
+settings_lang_es: Español
+settings_lang_ja: 日本語
+settings_lang_zh: 中文
+settings_lang_pt: Português
+settings_lang_ko: 한국어
+settings_lang_it: Italiano
+settings_lang_nl: Nederlands
+settings_lang_ua: Українська
