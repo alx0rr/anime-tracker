@@ -28,13 +28,31 @@ class _AnimeListScreenState extends State<AnimeListScreen> {
     final store = context.store;
     final s = context.s;
 
+    final tagOrders = {
+      for (final tag in store.getSortedTags()) tag.id: tag.order
+    };
+
+    int getMinTagOrder(dynamic animeItem) {
+      if (animeItem.tagIds.isEmpty) return 999999;
+      return animeItem.tagIds
+          .map((id) => tagOrders[id] ?? 999999)
+          .reduce((a, b) => a < b ? a : b);
+    }
+
     final filtered = store.anime.where((item) {
       final matchesTitle = _query.isEmpty ||
           item.title.toLowerCase().contains(_query.toLowerCase());
       final matchesTags = _filterTagIds.isEmpty ||
           _filterTagIds.any((id) => item.tagIds.contains(id));
       return matchesTitle && matchesTags;
-    }).toList();
+    }).toList()
+      ..sort((a, b) {
+        final orderA = getMinTagOrder(a);
+        final orderB = getMinTagOrder(b);
+        final tagComparison = orderA.compareTo(orderB);
+        if (tagComparison != 0) return tagComparison;
+        return a.title.compareTo(b.title);
+      });
 
     return Scaffold(
       backgroundColor: const Color(0xFF0D0D1A),
@@ -99,7 +117,7 @@ class _AnimeListScreenState extends State<AnimeListScreen> {
               child: ListView(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 scrollDirection: Axis.horizontal,
-                children: store.tags.map((tag) {
+                children: store.getSortedTags().map((tag) {
                   final sel = _filterTagIds.contains(tag.id);
                   return Padding(
                     padding: const EdgeInsets.only(right: 8),
@@ -112,8 +130,9 @@ class _AnimeListScreenState extends State<AnimeListScreen> {
                                   ? FontWeight.w600
                                   : FontWeight.normal)),
                       selected: sel,
-                      onSelected: (v) => setState(() =>
-                          v ? _filterTagIds.add(tag.id) : _filterTagIds.remove(tag.id)),
+                      onSelected: (v) => setState(() => v
+                          ? _filterTagIds.add(tag.id)
+                          : _filterTagIds.remove(tag.id)),
                       backgroundColor: const Color(0xFF1A1A2E),
                       selectedColor: Color(tag.color).withOpacity(0.15),
                       checkmarkColor: Color(tag.color),

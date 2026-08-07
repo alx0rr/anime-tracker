@@ -58,3 +58,10 @@ settings_lang_ko: 한국어
 settings_lang_it: Italiano
 settings_lang_nl: Nederlands
 settings_lang_ua: Українська
+
+
+nav_statistics: "통계"
+stats_total: "전체 애니메이션"
+stats_by_tags: "태그별"
+stats_anime: "애니메이션"
+tags_manage: "태그 관리"

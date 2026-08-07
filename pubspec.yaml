@@ -1,7 +1,7 @@
 name: anime_tracker
 description: "An app for recording your anime. Add tags and links to websites for viewing."
 publish_to: 'none'
-version: 2.0.0+3
+version: 2.3.0+1
 
 environment:
   sdk: ^3.11.1
@@ -31,6 +31,14 @@ flutter_launcher_icons:
   image_path: "assets/icon.png"
   adaptive_icon_background: "#ffffff"
   adaptive_icon_foreground: "assets/icon.png"
+  macos:
+    generate: true
+    image_path: "../assets/icon/icon.png"
+  windows:
+    generate: true
+    image_path: "../assets/icon/icon.png"
+    icon_size: 48
+
 
 flutter:
   uses-material-design: true

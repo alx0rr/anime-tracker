@@ -5,6 +5,7 @@ import '../models/anime_item.dart';
 import '../store/store_provider.dart';
 import '../l10n/strings.dart';
 import '../sheets/edit_sheet.dart';
+import '../sheets/anime_tags_sheet.dart';
 
 class AnimeDetailScreen extends StatelessWidget {
   final String itemId;
@@ -74,6 +75,12 @@ class AnimeDetailScreen extends StatelessWidget {
                   : null,
             ),
             actions: [
+              IconButton(
+                icon: const Icon(Icons.label_outline, color: Colors.white),
+                onPressed: () {
+                  openAnimeTagsSheet(context, item);
+                },
+              ),
               IconButton(
                 icon: const Icon(Icons.edit_outlined, color: Colors.white),
                 onPressed: () {

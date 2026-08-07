@@ -4,6 +4,13 @@ nav_anime: Anime
 nav_tags: Etiquetas
 nav_settings: Ajustes
 
+nav_statistics: "Estadísticas"
+stats_total: "Total de anime"
+stats_by_tags: "Por etiquetas"
+stats_anime: "anime"
+tags_manage: "Gestionar etiquetas"
+
+
 list_empty: Lista vacía
 list_nothing_found: No se encontró nada
 search_hint: Buscar...

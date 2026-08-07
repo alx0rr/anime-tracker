@@ -58,3 +58,10 @@ settings_lang_ko: 한국어
 settings_lang_it: Italiano
 settings_lang_nl: Nederlands
 settings_lang_ua: Українська
+
+
+nav_statistics: "統計"
+stats_total: "アニメ総数"
+stats_by_tags: "タグ別"
+stats_anime: "アニメ"
+tags_manage: "タグ管理"

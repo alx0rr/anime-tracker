@@ -58,3 +58,10 @@ settings_lang_ko: 한국어
 settings_lang_it: Italiano
 settings_lang_nl: Nederlands
 settings_lang_ua: Українська
+
+
+nav_statistics: "Estatísticas"
+stats_total: "Total de animes"
+stats_by_tags: "Por tags"
+stats_anime: "animes"
+tags_manage: "Gerenciar tags"

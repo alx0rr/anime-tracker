@@ -65,3 +65,10 @@ settings_lang_ko: 한국어
 settings_lang_it: Italiano
 settings_lang_nl: Nederlands
 settings_lang_ua: Українська
+
+
+nav_statistics: "Статистика"
+stats_total: "Усього аніме"
+stats_by_tags: "За тегами"
+stats_anime: "аніме"
+tags_manage: "Управління тегами"

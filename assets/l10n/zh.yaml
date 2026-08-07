@@ -58,3 +58,10 @@ settings_lang_ko: 한국어
 settings_lang_it: Italiano
 settings_lang_nl: Nederlands
 settings_lang_ua: Українська
+
+
+nav_statistics: "统计"
+stats_total: "动漫总数"
+stats_by_tags: "按标签"
+stats_anime: "部动漫"
+tags_manage: "标签管理"

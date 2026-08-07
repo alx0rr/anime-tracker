@@ -4,6 +4,14 @@ nav_anime: Аниме
 nav_tags: Теги
 nav_settings: Настройки
 
+
+nav_statistics: "Статистика"
+stats_total: "Всего аниме"
+stats_by_tags: "По тегам"
+stats_anime: "аниме"
+tags_manage: "Управление тегами"
+
+
 list_empty: Список пуст
 list_nothing_found: Ничего не найдено
 search_hint: Поиск...

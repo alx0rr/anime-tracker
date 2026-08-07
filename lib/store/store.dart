@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:file_picker/file_picker.dart';
 import '../models/anime_item.dart';
@@ -97,15 +97,22 @@ class Store extends ChangeNotifier {
   }
 
   Future<void> exportToFile() async {
-    final data = jsonEncode({
+    final jsonString = jsonEncode({
       'anime': anime.map((e) => e.toJson()).toList(),
       'tags': tags.map((e) => e.toJson()).toList(),
     });
+
     final path = await FilePicker.platform.saveFile(
       dialogTitle: 'Save backup',
       fileName: 'anime_backup.json',
+      type: FileType.custom,
+      allowedExtensions: ['json'],
     );
-    if (path != null) await File(path).writeAsString(data);
+
+    if (path != null) {
+      final file = File(path);
+      await file.writeAsString(jsonString);
+    }
   }
 
   Future<void> importFromFile() async {
@@ -113,8 +120,12 @@ class Store extends ChangeNotifier {
       type: FileType.custom,
       allowedExtensions: ['json'],
     );
-    if (result != null && result.files.single.path != null) {
-      final raw = await File(result.files.single.path!).readAsString();
+
+    if (result != null && result.files.isNotEmpty) {
+      final filePath = result.files.single.path;
+      if (filePath == null) return;
+
+      final raw = await File(filePath).readAsString();
       final data = jsonDecode(raw) as Map<String, dynamic>;
 
       final importedAnime =
@@ -143,5 +154,30 @@ class Store extends ChangeNotifier {
       await _saveAnime();
       await _saveTags();
     }
+  }
+
+  Future<void> reorderTags(int oldIndex, int newIndex) async {
+    if (oldIndex < newIndex) {
+      newIndex -= 1;
+    }
+
+    final tagsList = getSortedTags();
+
+    final item = tagsList.removeAt(oldIndex);
+    tagsList.insert(newIndex, item);
+
+    for (int i = 0; i < tagsList.length; i++) {
+      tagsList[i] = tagsList[i].copyWith(order: i);
+    }
+
+    this.tags = tagsList;
+    notifyListeners();
+    await _saveTags();
+  }
+
+  List<AnimeTag> getSortedTags() {
+    final sorted = List<AnimeTag>.from(tags);
+    sorted.sort((a, b) => a.order.compareTo(b.order));
+    return sorted;
   }
 }
