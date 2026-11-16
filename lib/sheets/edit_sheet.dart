@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
 import '../models/anime_item.dart';
@@ -9,7 +10,9 @@ import '../store/store.dart';
 import '../l10n/strings.dart';
 import '../utils/input_decoration.dart';
 import '../theme/app_theme.dart';
+import '../widgets/anime_meta.dart';
 import '../widgets/common.dart';
+import 'anime_search_sheet.dart';
 import 'button_editor.dart';
 
 
@@ -31,6 +34,14 @@ void _show(BuildContext context, AnimeItem? existing, Store store) {
   final selectedTags = Set<String>.from(existing?.tagIds ?? []);
   String? imageBase64 = existing?.imageBase64;
   final buttons = List<AnimeButton>.from(existing?.buttons ?? []);
+  var status = existing?.status ?? WatchStatus.planned;
+  final progressCtrl = TextEditingController(
+      text: (existing?.progress ?? 0) > 0 ? '${existing!.progress}' : '');
+  final totalCtrl = TextEditingController(
+      text: (existing?.totalEpisodes ?? 0) > 0
+          ? '${existing!.totalEpisodes}'
+          : '');
+  int? rating = existing?.rating;
 
   showModalBottomSheet(
     context: context,
@@ -38,6 +49,26 @@ void _show(BuildContext context, AnimeItem? existing, Store store) {
     builder: (ctx) => StatefulBuilder(
       builder: (ctx, setState) {
         final currentTags = store.getSortedTags();
+
+        Future<void> findOnline() async {
+          final r = await openAnimeSearchSheet(ctx,
+              initialQuery: titleCtrl.text.trim());
+          if (r == null) return;
+          setState(() {
+            titleCtrl.text = r.title;
+            if (r.description.isNotEmpty) descCtrl.text = r.description;
+            if (r.episodes > 0) totalCtrl.text = '${r.episodes}';
+            if (r.imageBase64 != null) imageBase64 = r.imageBase64;
+            if (r.url.isNotEmpty && !buttons.any((b) => b.url == r.url)) {
+              buttons.add(AnimeButton(
+                id: const Uuid().v4(),
+                label: r.source.label,
+                color: r.source.color,
+                url: r.url,
+              ));
+            }
+          });
+        }
 
         return Padding(
           padding: EdgeInsets.only(
@@ -52,12 +83,23 @@ void _show(BuildContext context, AnimeItem? existing, Store store) {
               children: [
                 Text(
                   existing == null ? s['edit_new_anime'] : s['edit_edit_anime'],
-                  style: const TextStyle(
+                  style: TextStyle(
                       color: AppColors.text,
                       fontSize: 20,
                       fontWeight: FontWeight.w700),
                 ),
                 const SizedBox(height: 16),
+
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: findOnline,
+                    icon: Icon(Icons.travel_explore_rounded,
+                        size: 18, color: AppColors.accent),
+                    label: Text(s['search_online']),
+                  ),
+                ),
+                const SizedBox(height: 12),
 
                 GestureDetector(
                   onTap: () async {
@@ -134,11 +176,11 @@ void _show(BuildContext context, AnimeItem? existing, Store store) {
                         : Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const Icon(Icons.add_photo_alternate_outlined,
+                              Icon(Icons.add_photo_alternate_outlined,
                                   color: AppColors.accent, size: 36),
                               const SizedBox(height: 8),
                               Text(s['edit_add_image'],
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                       color: AppColors.textDim, fontSize: 13)),
                             ],
                           ),
@@ -148,28 +190,69 @@ void _show(BuildContext context, AnimeItem? existing, Store store) {
 
                 TextField(
                   controller: titleCtrl,
-                  style: const TextStyle(color: AppColors.text),
+                  style: TextStyle(color: AppColors.text),
                   decoration: inputDec(s['edit_field_title']),
                 ),
                 const SizedBox(height: 12),
                 TextField(
                   controller: descCtrl,
                   maxLines: 2,
-                  style: const TextStyle(color: AppColors.text),
+                  style: TextStyle(color: AppColors.text),
                   decoration: inputDec(s['edit_field_desc']),
                 ),
                 const SizedBox(height: 12),
                 TextField(
                   controller: noteCtrl,
                   maxLines: 2,
-                  style: const TextStyle(color: AppColors.text),
+                  style: TextStyle(color: AppColors.text),
                   decoration: inputDec(s['edit_field_note']),
+                ),
+
+                const SizedBox(height: 16),
+                Text(s['edit_status'],
+                    style: TextStyle(color: AppColors.textDim, fontSize: 13)),
+                const SizedBox(height: 8),
+                StatusPicker(
+                  value: status,
+                  onChanged: (v) => setState(() => status = v),
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: progressCtrl,
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                        style: TextStyle(color: AppColors.text),
+                        decoration: inputDec(s['edit_progress']),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: TextField(
+                        controller: totalCtrl,
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                        style: TextStyle(color: AppColors.text),
+                        decoration: inputDec(s['edit_total_episodes']),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Text(s['edit_rating'],
+                    style: TextStyle(color: AppColors.textDim, fontSize: 13)),
+                const SizedBox(height: 10),
+                RatingPicker(
+                  value: rating,
+                  onChanged: (v) => setState(() => rating = v),
                 ),
 
                 if (currentTags.isNotEmpty) ...[
                   const SizedBox(height: 16),
                   Text(s['edit_tags'],
-                      style: const TextStyle(
+                      style: TextStyle(
                           color: AppColors.textDim, fontSize: 13)),
                   const SizedBox(height: 8),
                   Wrap(
@@ -195,16 +278,16 @@ void _show(BuildContext context, AnimeItem? existing, Store store) {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(s['edit_buttons'],
-                        style: const TextStyle(
+                        style: TextStyle(
                             color: AppColors.textDim, fontSize: 13)),
                     TextButton.icon(
                       onPressed: () => openButtonEditor(ctx, null, (btn) {
                         setState(() => buttons.add(btn));
                       }),
-                      icon: const Icon(Icons.add,
+                      icon: Icon(Icons.add,
                           size: 16, color: AppColors.accent),
                       label: Text(s['edit_add_button'],
-                          style: const TextStyle(
+                          style: TextStyle(
                               color: AppColors.accent, fontSize: 12)),
                       style: TextButton.styleFrom(
                           padding: EdgeInsets.zero,
@@ -244,12 +327,12 @@ void _show(BuildContext context, AnimeItem? existing, Store store) {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(btn.label,
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                           color: AppColors.text,
                                           fontSize: 13,
                                           fontWeight: FontWeight.w600)),
                                   Text(btn.url,
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                           color: AppColors.textFaint,
                                           fontSize: 11),
                                       maxLines: 1,
@@ -258,7 +341,7 @@ void _show(BuildContext context, AnimeItem? existing, Store store) {
                               ),
                             ),
                             IconButton(
-                              icon: const Icon(Icons.edit_outlined,
+                              icon: Icon(Icons.edit_outlined,
                                   color: AppColors.textFaint, size: 18),
                               padding: EdgeInsets.zero,
                               constraints: const BoxConstraints(),
@@ -268,7 +351,7 @@ void _show(BuildContext context, AnimeItem? existing, Store store) {
                             ),
                             const SizedBox(width: 4),
                             IconButton(
-                              icon: const Icon(Icons.close,
+                              icon: Icon(Icons.close,
                                   color: AppColors.danger, size: 18),
                               padding: EdgeInsets.zero,
                               constraints: const BoxConstraints(),
@@ -289,27 +372,34 @@ void _show(BuildContext context, AnimeItem? existing, Store store) {
                   onCancel: () => Navigator.pop(ctx),
                   onConfirm: () async {
                     if (titleCtrl.text.trim().isEmpty) return;
+                    final progress =
+                        int.tryParse(progressCtrl.text.trim()) ?? 0;
+                    final total = int.tryParse(totalCtrl.text.trim()) ?? 0;
+                    final base = existing ??
+                        AnimeItem(
+                          id: const Uuid().v4(),
+                          title: '',
+                          createdAt: DateTime.now(),
+                        );
+                    var item = base.copyWith(
+                      title: titleCtrl.text.trim(),
+                      description: descCtrl.text.trim(),
+                      note: noteCtrl.text.trim(),
+                      tagIds: selectedTags.toList(),
+                      imageBase64: imageBase64,
+                      clearImage: imageBase64 == null,
+                      buttons: buttons,
+                      status: status,
+                      totalEpisodes: total,
+                      progress: progress,
+                      rating: rating,
+                      clearRating: rating == null,
+                    );
+                    if (status == base.status) item = item.withProgress(progress);
                     if (existing == null) {
-                      await store.addAnime(AnimeItem(
-                        id: const Uuid().v4(),
-                        title: titleCtrl.text.trim(),
-                        description: descCtrl.text.trim(),
-                        note: noteCtrl.text.trim(),
-                        tagIds: selectedTags.toList(),
-                        createdAt: DateTime.now(),
-                        imageBase64: imageBase64,
-                        buttons: buttons,
-                      ));
+                      await store.addAnime(item);
                     } else {
-                      await store.updateAnime(existing.copyWith(
-                        title: titleCtrl.text.trim(),
-                        description: descCtrl.text.trim(),
-                        note: noteCtrl.text.trim(),
-                        tagIds: selectedTags.toList(),
-                        imageBase64: imageBase64,
-                        clearImage: imageBase64 == null,
-                        buttons: buttons,
-                      ));
+                      await store.updateAnime(item);
                     }
                     if (ctx.mounted) Navigator.pop(ctx);
                   },

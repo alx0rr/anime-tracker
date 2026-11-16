@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../l10n/strings.dart';
+import '../store/store_provider.dart';
 import '../theme/app_theme.dart';
 import 'anime_list_screen.dart';
 import 'tags_screen.dart';
@@ -26,6 +27,7 @@ class _RootScreenState extends State<RootScreen> {
   @override
   Widget build(BuildContext context) {
     final s = context.s;
+    context.store;
 
     return Scaffold(
       body: AnimatedSwitcher(
@@ -48,7 +50,7 @@ class _RootScreenState extends State<RootScreen> {
         ),
       ),
       bottomNavigationBar: DecoratedBox(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           border: Border(top: BorderSide(color: AppColors.outline)),
         ),
         child: NavigationBar(

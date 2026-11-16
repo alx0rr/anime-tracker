@@ -6,24 +6,52 @@ import 'package:file_picker/file_picker.dart';
 import '../models/anime_item.dart';
 import '../models/anime_tag.dart';
 
+enum SortMode { tags, added, title, rating }
+
 class Store extends ChangeNotifier {
   static const _animeKey = 'anime_v3';
   static const _tagsKey = 'tags_v3';
   static const _localeKey = 'locale';
+  static const themeModeKey = 'theme_mode';
+  static const viewGridKey = 'view_grid';
+  static const accentKey = 'accent_color';
+  static const _sortModeKey = 'sort_mode';
+  static const _sortAscKey = 'sort_asc';
 
   List<AnimeItem> anime = [];
   List<AnimeTag> tags = [];
   String locale = 'ru';
 
-  Store() {
+  String themeMode;
+  bool viewGrid;
+
+  int? accentColor;
+  SortMode sortMode = SortMode.tags;
+  bool sortAscending = true;
+
+  Store({
+    this.themeMode = 'dark',
+    this.viewGrid = false,
+    this.accentColor,
+  }) {
     _load();
   }
+
+  static bool _defaultAsc(SortMode m) =>
+      m == SortMode.tags || m == SortMode.title;
 
   Future<void> _load() async {
     final p = await SharedPreferences.getInstance();
     final ar = p.getString(_animeKey);
     final tr = p.getString(_tagsKey);
     locale = p.getString(_localeKey) ?? 'ru';
+    themeMode = p.getString(themeModeKey) ?? themeMode;
+    viewGrid = p.getBool(viewGridKey) ?? viewGrid;
+    accentColor = p.getInt(accentKey) ?? accentColor;
+    final sm = p.getString(_sortModeKey);
+    sortMode = SortMode.values.firstWhere((m) => m.name == sm,
+        orElse: () => SortMode.tags);
+    sortAscending = p.getBool(_sortAscKey) ?? _defaultAsc(sortMode);
     if (ar != null) {
       anime =
           (jsonDecode(ar) as List).map((e) => AnimeItem.fromJson(e)).toList();
@@ -51,6 +79,104 @@ class Store extends ChangeNotifier {
     final p = await SharedPreferences.getInstance();
     await p.setString(_localeKey, loc);
     notifyListeners();
+  }
+
+  Future<void> setThemeMode(String mode) async {
+    themeMode = mode;
+    notifyListeners();
+    final p = await SharedPreferences.getInstance();
+    await p.setString(themeModeKey, mode);
+  }
+
+  Future<void> setAccentColor(int? color) async {
+    accentColor = color;
+    notifyListeners();
+    final p = await SharedPreferences.getInstance();
+    if (color == null) {
+      await p.remove(accentKey);
+    } else {
+      await p.setInt(accentKey, color);
+    }
+  }
+
+  Future<void> setViewGrid(bool grid) async {
+    viewGrid = grid;
+    notifyListeners();
+    final p = await SharedPreferences.getInstance();
+    await p.setBool(viewGridKey, grid);
+  }
+
+  Future<void> setSort(SortMode mode) async {
+    if (mode == sortMode) {
+      sortAscending = !sortAscending;
+    } else {
+      sortMode = mode;
+      sortAscending = _defaultAsc(mode);
+    }
+    notifyListeners();
+    final p = await SharedPreferences.getInstance();
+    await p.setString(_sortModeKey, sortMode.name);
+    await p.setBool(_sortAscKey, sortAscending);
+  }
+
+  List<AnimeItem> sortItems(Iterable<AnimeItem> items) {
+    final tagOrders = {for (final t in tags) t.id: t.order};
+    int minTag(AnimeItem a) => a.tagIds.isEmpty
+        ? 999999
+        : a.tagIds
+            .map((id) => tagOrders[id] ?? 999999)
+            .reduce((x, y) => x < y ? x : y);
+    int byTitle(AnimeItem a, AnimeItem b) =>
+        a.title.toLowerCase().compareTo(b.title.toLowerCase());
+
+    int cmp(AnimeItem a, AnimeItem b) {
+      if (a.pinned != b.pinned) return a.pinned ? -1 : 1;
+      int r;
+      switch (sortMode) {
+        case SortMode.tags:
+          r = minTag(a).compareTo(minTag(b));
+          if (r == 0) r = byTitle(a, b);
+          return sortAscending ? r : -r;
+        case SortMode.added:
+          r = a.createdAt.compareTo(b.createdAt);
+          return sortAscending ? r : -r;
+        case SortMode.title:
+          r = byTitle(a, b);
+          return sortAscending ? r : -r;
+        case SortMode.rating:
+          if (a.rating == null && b.rating == null) return byTitle(a, b);
+          if (a.rating == null) return 1;
+          if (b.rating == null) return -1;
+          r = a.rating!.compareTo(b.rating!);
+          if (r == 0) return byTitle(a, b);
+          return sortAscending ? r : -r;
+      }
+    }
+
+    return items.toList()..sort(cmp);
+  }
+
+  Future<void> toggleFavorite(String id) async {
+    final i = anime.indexWhere((a) => a.id == id);
+    if (i == -1) return;
+    anime[i] = anime[i].copyWith(favorite: !anime[i].favorite);
+    notifyListeners();
+    await _saveAnime();
+  }
+
+  Future<void> togglePin(String id) async {
+    final i = anime.indexWhere((a) => a.id == id);
+    if (i == -1) return;
+    anime[i] = anime[i].copyWith(pinned: !anime[i].pinned);
+    notifyListeners();
+    await _saveAnime();
+  }
+
+  Future<void> restoreAnime(AnimeItem item) async {
+    if (anime.any((a) => a.id == item.id)) return;
+    anime.add(item);
+    notifyListeners();
+    await _saveAnime();
   }
 
   Future<void> addAnime(AnimeItem item) async {

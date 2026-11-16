@@ -62,12 +62,14 @@ class _FadeSlideInState extends State<FadeSlideIn>
 class Pressable extends StatefulWidget {
   final Widget child;
   final VoidCallback? onTap;
+  final VoidCallback? onLongPress;
   final double scale;
 
   const Pressable({
     super.key,
     required this.child,
     this.onTap,
+    this.onLongPress,
     this.scale = 0.97,
   });
 
@@ -88,6 +90,7 @@ class _PressableState extends State<Pressable> {
         onTapUp: (_) => _set(false),
         onTapCancel: () => _set(false),
         onTap: widget.onTap,
+        onLongPress: widget.onLongPress,
         child: AnimatedScale(
           scale: _down ? widget.scale : 1,
           duration: const Duration(milliseconds: 120),
@@ -174,7 +177,7 @@ class SectionLabel extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Text(
         text.toUpperCase(),
-        style: const TextStyle(
+        style: TextStyle(
             color: AppColors.textFaint,
             fontSize: 11,
             letterSpacing: 1.4,
@@ -309,11 +312,63 @@ class _EmptyStateState extends State<EmptyState>
                 padding: const EdgeInsets.symmetric(horizontal: 32),
                 child: Text(widget.text,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
+                    style: TextStyle(
                         color: AppColors.textDim, fontSize: 15, height: 1.4)),
               ),
             ],
           ),
         ),
       );
+}
+
+
+class ActionToggle extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final bool selected;
+  final Color? color;
+  final VoidCallback onTap;
+
+  const ActionToggle({
+    super.key,
+    required this.icon,
+    required this.label,
+    required this.selected,
+    required this.onTap,
+    this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final c = color ?? AppColors.accent;
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOutCubic,
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: BoxDecoration(
+          color: selected ? c.withOpacity(0.16) : AppColors.surfaceHigh,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+              color: selected ? c : AppColors.outline, width: 1.2),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 16, color: selected ? c : AppColors.textDim),
+            const SizedBox(width: 6),
+            Text(
+              label,
+              style: TextStyle(
+                color: selected ? c : AppColors.textDim,
+                fontSize: 13,
+                fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

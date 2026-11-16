@@ -79,11 +79,11 @@ class TagsScreen extends StatelessWidget {
                         ),
                       ),
                       title: Text(tag.name,
-                          style: const TextStyle(
+                          style: TextStyle(
                               color: AppColors.text,
                               fontWeight: FontWeight.w600)),
                       trailing: PopupMenuButton<String>(
-                        icon: const Icon(Icons.more_vert,
+                        icon: Icon(Icons.more_vert,
                             color: AppColors.textFaint),
                         onSelected: (v) async {
                           if (v == 'edit') {
@@ -98,7 +98,7 @@ class TagsScreen extends StatelessWidget {
                           PopupMenuItem(
                               value: 'delete',
                               child: Text(s['btn_delete'],
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                       color: AppColors.danger))),
                         ],
                       ),

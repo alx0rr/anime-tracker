@@ -3,19 +3,19 @@ import '../theme/app_theme.dart';
 
 InputDecoration inputDec(String hint) => InputDecoration(
       hintText: hint,
-      hintStyle: const TextStyle(color: AppColors.textFaint),
+      hintStyle: TextStyle(color: AppColors.textFaint),
       filled: true,
       fillColor: AppColors.surfaceHigh,
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: AppColors.outline)),
+          borderSide: BorderSide(color: AppColors.outline)),
       enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: AppColors.outline)),
+          borderSide: BorderSide(color: AppColors.outline)),
       focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: AppColors.accent, width: 1.5)),
+          borderSide: BorderSide(color: AppColors.accent, width: 1.5)),
     );
 
 const kTagColors = AppColors.tagPalette;

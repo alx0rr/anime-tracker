@@ -52,7 +52,7 @@
 ### Installation
 
 ```bash
-git clone https://github.com/your-username/anime_tracker.git
+git clone https://github.com/alx0rr/anime_tracker.git
 cd anime_tracker
 flutter pub get
 flutter run

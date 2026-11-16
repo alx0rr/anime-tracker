@@ -1,26 +1,99 @@
 import 'package:flutter/material.dart';
 
+class AppPalette {
+  final Brightness brightness;
+  final Color bg, surface, surfaceHigh, outline;
+  final Color text, textDim, textFaint;
+  final Color accent, onAccent, secondary, info;
+  final Color danger, success;
+
+  const AppPalette({
+    required this.brightness,
+    required this.bg,
+    required this.surface,
+    required this.surfaceHigh,
+    required this.outline,
+    required this.text,
+    required this.textDim,
+    required this.textFaint,
+    required this.accent,
+    required this.onAccent,
+    required this.secondary,
+    required this.info,
+    required this.danger,
+    required this.success,
+  });
+
+  static const dark = AppPalette(
+    brightness: Brightness.dark,
+    bg: Color(0xFF14120F),
+    surface: Color(0xFF1E1B16),
+    surfaceHigh: Color(0xFF29251E),
+    outline: Color(0xFF3A3429),
+    text: Color(0xFFF0E7D6),
+    textDim: Color(0xFFB5AB97),
+    textFaint: Color(0xFF7D7565),
+    accent: Color(0xFFE3A24F),
+    onAccent: Color(0xFF1C1408),
+    secondary: Color(0xFFC9604A),
+    info: Color(0xFF6F9FAE),
+    danger: Color(0xFFD8604E),
+    success: Color(0xFF8FA86B),
+  );
+
+  static const light = AppPalette(
+    brightness: Brightness.light,
+    bg: Color(0xFFF6F1E7),
+    surface: Color(0xFFFFFCF6),
+    surfaceHigh: Color(0xFFEFE8D9),
+    outline: Color(0xFFDDD3BF),
+    text: Color(0xFF2A2318),
+    textDim: Color(0xFF5E5543),
+    textFaint: Color(0xFF8F8573),
+    accent: Color(0xFFC27512),
+    onAccent: Color(0xFFFFF8EA),
+    secondary: Color(0xFFB5503B),
+    info: Color(0xFF4F7F8E),
+    danger: Color(0xFFC0463A),
+    success: Color(0xFF6B8A3F),
+  );
+}
+
 class AppColors {
   AppColors._();
 
-  static const bg = Color(0xFF14120F);
-  static const surface = Color(0xFF1E1B16);
-  static const surfaceHigh = Color(0xFF29251E);
-  static const outline = Color(0xFF3A3429);
+  static AppPalette _p = AppPalette.dark;
 
-  static const text = Color(0xFFF0E7D6);
-  static const textDim = Color(0xFFB5AB97);
-  static const textFaint = Color(0xFF7D7565);
+  static Color? _customAccent;
 
-  static const accent = Color(0xFFE3A24F);
-  static const onAccent = Color(0xFF1C1408);
-  static const secondary = Color(0xFFC9604A);
-  static const info = Color(0xFF6F9FAE);
+  static void apply(Brightness b, {Color? accent}) {
+    _p = b == Brightness.dark ? AppPalette.dark : AppPalette.light;
+    _customAccent = accent;
+  }
 
-  static const danger = Color(0xFFD8604E);
-  static const success = Color(0xFF8FA86B);
+  static Color get defaultAccent => _p.accent;
 
-  static const List<Color> logoGradient = [accent, secondary];
+  static bool get isDark => _p.brightness == Brightness.dark;
+
+  static Color get bg => _p.bg;
+  static Color get surface => _p.surface;
+  static Color get surfaceHigh => _p.surfaceHigh;
+  static Color get outline => _p.outline;
+
+  static Color get text => _p.text;
+  static Color get textDim => _p.textDim;
+  static Color get textFaint => _p.textFaint;
+
+  static Color get accent => _customAccent ?? _p.accent;
+  static Color get onAccent =>
+      _customAccent == null ? _p.onAccent : on(_customAccent!);
+  static Color get secondary => _p.secondary;
+  static Color get info => _p.info;
+
+  static Color get danger => _p.danger;
+  static Color get success => _p.success;
+
+  static List<Color> get logoGradient => [accent, secondary];
 
   static const List<int> tagPalette = [
     0xFFE3A24F,
@@ -43,29 +116,40 @@ class AppColors {
 
   static Color on(Color c) =>
       ThemeData.estimateBrightnessForColor(c) == Brightness.light
-          ? onAccent
-          : text;
+          ? const Color(0xFF1C1408)
+          : const Color(0xFFF0E7D6);
 }
 
 class AppTheme {
   AppTheme._();
 
-  static ThemeData dark() {
-    const scheme = ColorScheme.dark(
+  static ThemeData dark() => build(Brightness.dark);
+  static ThemeData light() => build(Brightness.light);
+
+  static ThemeData build(Brightness brightness, {Color? accent}) {
+    AppColors.apply(brightness, accent: accent);
+    final isDark = brightness == Brightness.dark;
+
+    final scheme = ColorScheme(
+      brightness: brightness,
       primary: AppColors.accent,
       onPrimary: AppColors.onAccent,
       secondary: AppColors.secondary,
-      onSecondary: AppColors.text,
+      onSecondary: isDark ? AppColors.text : Colors.white,
       surface: AppColors.surface,
       onSurface: AppColors.text,
+      onSurfaceVariant: AppColors.textDim,
+      secondaryContainer: AppColors.surfaceHigh,
+      onSecondaryContainer: AppColors.text,
       error: AppColors.danger,
+      onError: Colors.white,
       outline: AppColors.outline,
       surfaceTint: Colors.transparent,
       surfaceContainerHigh: AppColors.surfaceHigh,
       surfaceContainerHighest: AppColors.surfaceHigh,
     );
 
-    final baseText = ThemeData(brightness: Brightness.dark).textTheme.apply(
+    final baseText = ThemeData(brightness: brightness).textTheme.apply(
           bodyColor: AppColors.text,
           displayColor: AppColors.text,
         );
@@ -75,7 +159,7 @@ class AppTheme {
 
     return ThemeData(
       useMaterial3: true,
-      brightness: Brightness.dark,
+      brightness: brightness,
       colorScheme: scheme,
       scaffoldBackgroundColor: AppColors.bg,
       canvasColor: AppColors.surface,
@@ -88,7 +172,7 @@ class AppTheme {
         TargetPlatform.macOS: SoftPageTransitionsBuilder(),
         TargetPlatform.linux: SoftPageTransitionsBuilder(),
       }),
-      appBarTheme: const AppBarTheme(
+      appBarTheme: AppBarTheme(
         backgroundColor: AppColors.bg,
         foregroundColor: AppColors.text,
         surfaceTintColor: Colors.transparent,
@@ -102,14 +186,14 @@ class AppTheme {
           letterSpacing: -0.4,
         ),
       ),
-      iconTheme: const IconThemeData(color: AppColors.textDim),
-      dividerTheme: const DividerThemeData(
+      iconTheme: IconThemeData(color: AppColors.textDim),
+      dividerTheme: DividerThemeData(
         color: AppColors.outline,
         space: 1,
         thickness: 1,
       ),
       progressIndicatorTheme:
-          const ProgressIndicatorThemeData(color: AppColors.accent),
+          ProgressIndicatorThemeData(color: AppColors.accent),
       textSelectionTheme: TextSelectionThemeData(
         cursorColor: AppColors.accent,
         selectionHandleColor: AppColors.accent,
@@ -148,19 +232,19 @@ class AppTheme {
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
         backgroundColor: AppColors.surfaceHigh,
-        contentTextStyle: const TextStyle(color: AppColors.text),
+        contentTextStyle: TextStyle(color: AppColors.text),
         shape: rr(12),
       ),
       popupMenuTheme: PopupMenuThemeData(
         color: AppColors.surfaceHigh,
         surfaceTintColor: Colors.transparent,
-        textStyle: const TextStyle(color: AppColors.text, fontSize: 14),
+        textStyle: TextStyle(color: AppColors.text, fontSize: 14),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(14),
-          side: const BorderSide(color: AppColors.outline),
+          side: BorderSide(color: AppColors.outline),
         ),
       ),
-      bottomSheetTheme: const BottomSheetThemeData(
+      bottomSheetTheme: BottomSheetThemeData(
         backgroundColor: AppColors.surface,
         modalBackgroundColor: AppColors.surface,
         surfaceTintColor: Colors.transparent,
@@ -183,7 +267,7 @@ class AppTheme {
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.textDim,
-          side: const BorderSide(color: AppColors.outline),
+          side: BorderSide(color: AppColors.outline),
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
           shape: rr(14),
         ),

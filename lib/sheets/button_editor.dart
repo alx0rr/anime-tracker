@@ -23,11 +23,11 @@ void openButtonEditor(
         backgroundColor: AppColors.surface,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(22),
-          side: const BorderSide(color: AppColors.outline),
+          side: BorderSide(color: AppColors.outline),
         ),
         title: Text(
           existing == null ? s['btn_editor_new'] : s['btn_editor_edit'],
-          style: const TextStyle(
+          style: TextStyle(
               color: AppColors.text,
               fontSize: 18,
               fontWeight: FontWeight.w700),
@@ -38,13 +38,13 @@ void openButtonEditor(
             children: [
               TextField(
                 controller: labelCtrl,
-                style: const TextStyle(color: AppColors.text),
+                style: TextStyle(color: AppColors.text),
                 decoration: inputDec(s['btn_editor_label']),
               ),
               const SizedBox(height: 10),
               TextField(
                 controller: urlCtrl,
-                style: const TextStyle(color: AppColors.text),
+                style: TextStyle(color: AppColors.text),
                 decoration: inputDec(s['btn_editor_url']),
                 keyboardType: TextInputType.url,
               ),
@@ -52,7 +52,7 @@ void openButtonEditor(
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text(s['btn_editor_color'],
-                    style: const TextStyle(
+                    style: TextStyle(
                         color: AppColors.textDim, fontSize: 13)),
               ),
               const SizedBox(height: 10),
@@ -72,7 +72,7 @@ void openButtonEditor(
           TextButton(
             onPressed: () => Navigator.pop(ctx),
             child: Text(s['btn_cancel'],
-                style: const TextStyle(color: AppColors.textDim)),
+                style: TextStyle(color: AppColors.textDim)),
           ),
           ElevatedButton(
             onPressed: () {

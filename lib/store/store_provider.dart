@@ -8,14 +8,29 @@ extension StoreExt on BuildContext {
 
 class StoreProvider extends StatefulWidget {
   final Widget child;
-  const StoreProvider({super.key, required this.child});
+
+  final String initialThemeMode;
+  final bool initialViewGrid;
+  final int? initialAccent;
+
+  const StoreProvider({
+    super.key,
+    required this.child,
+    this.initialThemeMode = 'dark',
+    this.initialViewGrid = false,
+    this.initialAccent,
+  });
 
   @override
   State<StoreProvider> createState() => _StoreProviderState();
 }
 
 class _StoreProviderState extends State<StoreProvider> {
-  final _store = Store();
+  late final Store _store = Store(
+    themeMode: widget.initialThemeMode,
+    viewGrid: widget.initialViewGrid,
+    accentColor: widget.initialAccent,
+  );
 
   @override
   void initState() {

@@ -1,7 +1,7 @@
 name: anime_tracker
 description: "An app for recording your anime. Add tags and links to websites for viewing."
 publish_to: 'none'
-version: 2.3.0+1
+version: 3.0.0+1
 
 environment:
   sdk: ^3.11.1

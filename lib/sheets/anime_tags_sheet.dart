@@ -26,7 +26,7 @@ void openAnimeTagsSheet(BuildContext context, AnimeItem item) {
           children: [
             Text(
               s['tags_manage'],
-              style: const TextStyle(
+              style: TextStyle(
                   color: AppColors.text,
                   fontSize: 20,
                   fontWeight: FontWeight.w700),

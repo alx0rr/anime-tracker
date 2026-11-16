@@ -29,7 +29,7 @@ void openTagSheet(BuildContext context, AnimeTag? existing) {
           children: [
             Text(
               existing == null ? s['tag_new'] : s['tag_edit'],
-              style: const TextStyle(
+              style: TextStyle(
                   color: AppColors.text,
                   fontSize: 20,
                   fontWeight: FontWeight.w700),
@@ -37,13 +37,13 @@ void openTagSheet(BuildContext context, AnimeTag? existing) {
             const SizedBox(height: 16),
             TextField(
               controller: nameCtrl,
-              style: const TextStyle(color: AppColors.text),
+              style: TextStyle(color: AppColors.text),
               decoration: inputDec(s['tag_name']),
             ),
             const SizedBox(height: 18),
             Text(s['tag_color'],
                 style:
-                    const TextStyle(color: AppColors.textDim, fontSize: 13)),
+                    TextStyle(color: AppColors.textDim, fontSize: 13)),
             const SizedBox(height: 12),
             ColorPalettePicker(
               selected: pickedColor,
