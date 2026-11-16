@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'l10n/strings.dart';
 import 'store/store_provider.dart';
 import 'screens/root_screen.dart';
+import 'theme/app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,13 +25,7 @@ class AnimeTrackerApp extends StatelessWidget {
           builder: (ctx) => MaterialApp(
             title: 'Anime Tracker',
             debugShowCheckedModeBanner: false,
-            theme: ThemeData.dark().copyWith(
-              scaffoldBackgroundColor: const Color(0xFF0D0D1A),
-              colorScheme: const ColorScheme.dark(
-                primary: Color(0xFF7C3AED),
-                surface: Color(0xFF1A1A2E),
-              ),
-            ),
+            theme: AppTheme.dark(),
             home: const RootScreen(),
           ),
         ),

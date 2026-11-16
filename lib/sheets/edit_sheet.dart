@@ -8,6 +8,8 @@ import '../models/anime_button.dart';
 import '../store/store.dart';
 import '../l10n/strings.dart';
 import '../utils/input_decoration.dart';
+import '../theme/app_theme.dart';
+import '../widgets/common.dart';
 import 'button_editor.dart';
 
 
@@ -33,18 +35,15 @@ void _show(BuildContext context, AnimeItem? existing, Store store) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
-    backgroundColor: const Color(0xFF1A1A2E),
-    shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
     builder: (ctx) => StatefulBuilder(
       builder: (ctx, setState) {
-        final currentTags = store.tags;
+        final currentTags = store.getSortedTags();
 
         return Padding(
           padding: EdgeInsets.only(
               left: 24,
               right: 24,
-              top: 24,
+              top: 4,
               bottom: MediaQuery.of(ctx).viewInsets.bottom + 24),
           child: SingleChildScrollView(
             child: Column(
@@ -54,9 +53,9 @@ void _show(BuildContext context, AnimeItem? existing, Store store) {
                 Text(
                   existing == null ? s['edit_new_anime'] : s['edit_edit_anime'],
                   style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold),
+                      color: AppColors.text,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700),
                 ),
                 const SizedBox(height: 16),
 
@@ -77,10 +76,10 @@ void _show(BuildContext context, AnimeItem? existing, Store store) {
                     width: double.infinity,
                     height: 160,
                     decoration: BoxDecoration(
-                      color: const Color(0xFF252540),
-                      borderRadius: BorderRadius.circular(12),
+                      color: AppColors.surfaceHigh,
+                      borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                          color: const Color(0xFF7C3AED).withOpacity(0.3)),
+                          color: AppColors.accent.withOpacity(0.35)),
                     ),
                     clipBehavior: Clip.antiAlias,
                     child: imageBase64 != null
@@ -136,11 +135,11 @@ void _show(BuildContext context, AnimeItem? existing, Store store) {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               const Icon(Icons.add_photo_alternate_outlined,
-                                  color: Colors.white24, size: 36),
+                                  color: AppColors.accent, size: 36),
                               const SizedBox(height: 8),
                               Text(s['edit_add_image'],
                                   style: const TextStyle(
-                                      color: Colors.white38, fontSize: 13)),
+                                      color: AppColors.textDim, fontSize: 13)),
                             ],
                           ),
                   ),
@@ -149,85 +148,64 @@ void _show(BuildContext context, AnimeItem? existing, Store store) {
 
                 TextField(
                   controller: titleCtrl,
-                  style: const TextStyle(color: Colors.white),
+                  style: const TextStyle(color: AppColors.text),
                   decoration: inputDec(s['edit_field_title']),
                 ),
                 const SizedBox(height: 12),
                 TextField(
                   controller: descCtrl,
                   maxLines: 2,
-                  style: const TextStyle(color: Colors.white),
+                  style: const TextStyle(color: AppColors.text),
                   decoration: inputDec(s['edit_field_desc']),
                 ),
                 const SizedBox(height: 12),
                 TextField(
                   controller: noteCtrl,
                   maxLines: 2,
-                  style: const TextStyle(color: Colors.white),
+                  style: const TextStyle(color: AppColors.text),
                   decoration: inputDec(s['edit_field_note']),
                 ),
 
-                // Tags
                 if (currentTags.isNotEmpty) ...[
                   const SizedBox(height: 16),
                   Text(s['edit_tags'],
                       style: const TextStyle(
-                          color: Colors.white60, fontSize: 13)),
+                          color: AppColors.textDim, fontSize: 13)),
                   const SizedBox(height: 8),
                   Wrap(
                     spacing: 8,
                     runSpacing: 8,
                     children: currentTags.map((tag) {
-                      final sel = selectedTags.contains(tag.id);
-                      return GestureDetector(
-                        onTap: () => setState(() => sel
-                            ? selectedTags.remove(tag.id)
-                            : selectedTags.add(tag.id)),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: sel
-                                ? Color(tag.color).withOpacity(0.2)
-                                : Colors.white.withOpacity(0.05),
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(
-                                color:
-                                    sel ? Color(tag.color) : Colors.white12,
-                                width: sel ? 1.5 : 1),
-                          ),
-                          child: Text(tag.name,
-                              style: TextStyle(
-                                  color: sel
-                                      ? Color(tag.color)
-                                      : Colors.white38,
-                                  fontSize: 13,
-                                  fontWeight: sel
-                                      ? FontWeight.w600
-                                      : FontWeight.normal)),
-                        ),
+                      return SelectableTagChip(
+                        label: tag.name,
+                        color: Color(tag.color),
+                        selected: selectedTags.contains(tag.id),
+                        onTap: () => setState(() {
+                          if (!selectedTags.remove(tag.id)) {
+                            selectedTags.add(tag.id);
+                          }
+                        }),
                       );
                     }).toList(),
                   ),
                 ],
 
-                // Buttons
                 const SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(s['edit_buttons'],
                         style: const TextStyle(
-                            color: Colors.white60, fontSize: 13)),
+                            color: AppColors.textDim, fontSize: 13)),
                     TextButton.icon(
                       onPressed: () => openButtonEditor(ctx, null, (btn) {
                         setState(() => buttons.add(btn));
                       }),
                       icon: const Icon(Icons.add,
-                          size: 16, color: Color(0xFF7C3AED)),
+                          size: 16, color: AppColors.accent),
                       label: Text(s['edit_add_button'],
                           style: const TextStyle(
-                              color: Color(0xFF7C3AED), fontSize: 12)),
+                              color: AppColors.accent, fontSize: 12)),
                       style: TextButton.styleFrom(
                           padding: EdgeInsets.zero,
                           minimumSize: Size.zero,
@@ -246,8 +224,8 @@ void _show(BuildContext context, AnimeItem? existing, Store store) {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 12, vertical: 8),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF252540),
-                          borderRadius: BorderRadius.circular(10),
+                          color: AppColors.surfaceHigh,
+                          borderRadius: BorderRadius.circular(12),
                           border: Border.all(
                               color: Color(btn.color).withOpacity(0.3)),
                         ),
@@ -267,12 +245,12 @@ void _show(BuildContext context, AnimeItem? existing, Store store) {
                                 children: [
                                   Text(btn.label,
                                       style: const TextStyle(
-                                          color: Colors.white,
+                                          color: AppColors.text,
                                           fontSize: 13,
                                           fontWeight: FontWeight.w600)),
                                   Text(btn.url,
                                       style: const TextStyle(
-                                          color: Colors.white38,
+                                          color: AppColors.textFaint,
                                           fontSize: 11),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis),
@@ -281,7 +259,7 @@ void _show(BuildContext context, AnimeItem? existing, Store store) {
                             ),
                             IconButton(
                               icon: const Icon(Icons.edit_outlined,
-                                  color: Colors.white38, size: 18),
+                                  color: AppColors.textFaint, size: 18),
                               padding: EdgeInsets.zero,
                               constraints: const BoxConstraints(),
                               onPressed: () => openButtonEditor(ctx, btn,
@@ -291,7 +269,7 @@ void _show(BuildContext context, AnimeItem? existing, Store store) {
                             const SizedBox(width: 4),
                             IconButton(
                               icon: const Icon(Icons.close,
-                                  color: Colors.redAccent, size: 18),
+                                  color: AppColors.danger, size: 18),
                               padding: EdgeInsets.zero,
                               constraints: const BoxConstraints(),
                               onPressed: () =>
@@ -305,58 +283,37 @@ void _show(BuildContext context, AnimeItem? existing, Store store) {
                 ],
 
                 const SizedBox(height: 24),
-                Row(children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () => Navigator.pop(ctx),
-                      style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: Colors.white24),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12))),
-                      child: Text(s['btn_cancel'],
-                          style: const TextStyle(color: Colors.white54)),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () async {
-                        if (titleCtrl.text.trim().isEmpty) return;
-                        if (existing == null) {
-                          await store.addAnime(AnimeItem(
-                            id: const Uuid().v4(),
-                            title: titleCtrl.text.trim(),
-                            description: descCtrl.text.trim(),
-                            note: noteCtrl.text.trim(),
-                            tagIds: selectedTags.toList(),
-                            createdAt: DateTime.now(),
-                            imageBase64: imageBase64,
-                            buttons: buttons,
-                          ));
-                        } else {
-                          await store.updateAnime(existing.copyWith(
-                            title: titleCtrl.text.trim(),
-                            description: descCtrl.text.trim(),
-                            note: noteCtrl.text.trim(),
-                            tagIds: selectedTags.toList(),
-                            imageBase64: imageBase64,
-                            clearImage: imageBase64 == null,
-                            buttons: buttons,
-                          ));
-                        }
-                        if (ctx.mounted) Navigator.pop(ctx);
-                      },
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF7C3AED),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12))),
-                      child: Text(
-                        existing == null ? s['btn_add'] : s['btn_save'],
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                    ),
-                  ),
-                ]),
+                SheetActions(
+                  cancelLabel: s['btn_cancel'],
+                  confirmLabel: existing == null ? s['btn_add'] : s['btn_save'],
+                  onCancel: () => Navigator.pop(ctx),
+                  onConfirm: () async {
+                    if (titleCtrl.text.trim().isEmpty) return;
+                    if (existing == null) {
+                      await store.addAnime(AnimeItem(
+                        id: const Uuid().v4(),
+                        title: titleCtrl.text.trim(),
+                        description: descCtrl.text.trim(),
+                        note: noteCtrl.text.trim(),
+                        tagIds: selectedTags.toList(),
+                        createdAt: DateTime.now(),
+                        imageBase64: imageBase64,
+                        buttons: buttons,
+                      ));
+                    } else {
+                      await store.updateAnime(existing.copyWith(
+                        title: titleCtrl.text.trim(),
+                        description: descCtrl.text.trim(),
+                        note: noteCtrl.text.trim(),
+                        tagIds: selectedTags.toList(),
+                        imageBase64: imageBase64,
+                        clearImage: imageBase64 == null,
+                        buttons: buttons,
+                      ));
+                    }
+                    if (ctx.mounted) Navigator.pop(ctx);
+                  },
+                ),
                 const SizedBox(height: 8),
               ],
             ),

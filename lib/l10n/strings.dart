@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:yaml/yaml.dart';
+import '../theme/app_theme.dart';
 
 class AppStrings {
   final Map<String, String> _data;
@@ -92,11 +93,11 @@ class _L10nProviderState extends State<L10nProvider> {
   @override
   Widget build(BuildContext context) {
     if (!_ready) {
-      return const MaterialApp(
-        home: Scaffold(
-          backgroundColor: Color(0xFF0D0D1A),
-          body: Center(
-              child: CircularProgressIndicator(color: Color(0xFF7C3AED))),
+      return MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.dark(),
+        home: const Scaffold(
+          body: Center(child: CircularProgressIndicator()),
         ),
       );
     }

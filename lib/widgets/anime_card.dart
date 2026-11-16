@@ -4,6 +4,8 @@ import '../models/anime_item.dart';
 import '../store/store_provider.dart';
 import '../sheets/edit_sheet.dart';
 import '../screens/anime_detail_screen.dart';
+import '../theme/app_theme.dart';
+import 'common.dart';
 
 class AnimeCard extends StatelessWidget {
   final AnimeItem item;
@@ -15,114 +17,105 @@ class AnimeCard extends StatelessWidget {
     final itemTags =
         store.tags.where((t) => item.tagIds.contains(t.id)).toList();
 
-    return GestureDetector(
-      onTap: () => Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (_) => AnimeDetailScreen(itemId: item.id)),
-      ),
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        decoration: BoxDecoration(
-          color: const Color(0xFF1A1A2E),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.white.withOpacity(0.07)),
+    const posterW = 84.0;
+    const posterH = 116.0;
+    final radius = BorderRadius.circular(12);
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Pressable(
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (_) => AnimeDetailScreen(itemId: item.id)),
         ),
-        child: Row(
-          children: [
-            if (item.imageBase64 != null)
+        child: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: AppColors.outline),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
               ClipRRect(
-                borderRadius: const BorderRadius.horizontal(
-                    left: Radius.circular(16)),
-                child: Image.memory(
-                  base64Decode(item.imageBase64!),
-                  width: 80,
-                  height: 100,
-                  fit: BoxFit.cover,
-                ),
-              )
-            else
-              Container(
-                width: 80,
-                height: 100,
-                decoration: const BoxDecoration(
-                  color: Color(0xFF252540),
-                  borderRadius: BorderRadius.horizontal(
-                      left: Radius.circular(16)),
-                ),
-                child: const Icon(Icons.image_outlined,
-                    color: Colors.white12, size: 32),
-              ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 12, vertical: 10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(item.title,
-                        style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600)),
-                    if (item.description.isNotEmpty) ...[
-                      const SizedBox(height: 4),
-                      Text(item.description,
-                          style: const TextStyle(
-                              color: Colors.white54, fontSize: 13),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis),
-                    ],
-                    if (itemTags.isNotEmpty) ...[
-                      const SizedBox(height: 8),
-                      Wrap(
-                        spacing: 6,
-                        children: itemTags
-                            .map((t) => Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 8, vertical: 2),
-                                  decoration: BoxDecoration(
-                                    color:
-                                        Color(t.color).withOpacity(0.15),
-                                    borderRadius: BorderRadius.circular(10),
-                                    border: Border.all(
-                                        color: Color(t.color)
-                                            .withOpacity(0.4)),
-                                  ),
-                                  child: Text(t.name,
-                                      style: TextStyle(
-                                          color: Color(t.color),
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.w600)),
-                                ))
-                            .toList(),
+                borderRadius: radius,
+                child: item.imageBase64 != null
+                    ? Image.memory(
+                        base64Decode(item.imageBase64!),
+                        width: posterW,
+                        height: posterH,
+                        fit: BoxFit.cover,
+                        gaplessPlayback: true,
+                      )
+                    : Container(
+                        width: posterW,
+                        height: posterH,
+                        color: AppColors.surfaceHigh,
+                        child: const Icon(Icons.movie_outlined,
+                            color: AppColors.textFaint, size: 30),
                       ),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(12, 4, 0, 4),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(item.title,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                              color: AppColors.text,
+                              fontSize: 16,
+                              height: 1.2,
+                              fontWeight: FontWeight.w700)),
+                      if (item.description.isNotEmpty) ...[
+                        const SizedBox(height: 5),
+                        Text(item.description,
+                            style: const TextStyle(
+                                color: AppColors.textDim,
+                                fontSize: 13,
+                                height: 1.35),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis),
+                      ],
+                      if (itemTags.isNotEmpty) ...[
+                        const SizedBox(height: 10),
+                        Wrap(
+                          spacing: 6,
+                          runSpacing: 6,
+                          children: itemTags
+                              .map((t) =>
+                                  TagPill(name: t.name, color: Color(t.color)))
+                              .toList(),
+                        ),
+                      ],
                     ],
-                  ],
+                  ),
                 ),
               ),
-            ),
-            PopupMenuButton<String>(
-              color: const Color(0xFF1A1A2E),
-              icon: const Icon(Icons.more_vert, color: Colors.white38),
-              onSelected: (v) async {
-                if (v == 'edit') {
-                  openEditSheet(context, item, store);
-                } else if (v == 'delete') {
-                  await store.deleteAnime(item.id);
-                }
-              },
-              itemBuilder: (_) => const [
-                PopupMenuItem(
-                    value: 'edit',
-                    child: Text('Редактировать',
-                        style: TextStyle(color: Colors.white70))),
-                PopupMenuItem(
-                    value: 'delete',
-                    child: Text('Удалить',
-                        style: TextStyle(color: Colors.redAccent))),
-              ],
-            ),
-          ],
+              PopupMenuButton<String>(
+                icon: const Icon(Icons.more_vert, color: AppColors.textFaint),
+                padding: EdgeInsets.zero,
+                onSelected: (v) async {
+                  if (v == 'edit') {
+                    openEditSheet(context, item, store);
+                  } else if (v == 'delete') {
+                    await store.deleteAnime(item.id);
+                  }
+                },
+                itemBuilder: (_) => const [
+                  PopupMenuItem(value: 'edit', child: Text('Редактировать')),
+                  PopupMenuItem(
+                      value: 'delete',
+                      child: Text('Удалить',
+                          style: TextStyle(color: AppColors.danger))),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

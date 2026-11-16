@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import '../store/store_provider.dart';
 import '../l10n/strings.dart';
 import '../sheets/edit_sheet.dart';
+import '../theme/app_theme.dart';
 import '../widgets/anime_card.dart';
+import '../widgets/common.dart';
 
 class AnimeListScreen extends StatefulWidget {
   const AnimeListScreen({super.key});
@@ -55,28 +57,49 @@ class _AnimeListScreenState extends State<AnimeListScreen> {
       });
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0D0D1A),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0D0D1A),
-        title: _showSearch
-            ? TextField(
-                controller: _searchCtrl,
-                autofocus: true,
-                style: const TextStyle(color: Colors.white),
-                decoration: InputDecoration(
-                  hintText: s['search_hint'],
-                  hintStyle: const TextStyle(color: Colors.white38),
-                  border: InputBorder.none,
+        title: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 220),
+          transitionBuilder: (child, anim) => FadeTransition(
+            opacity: anim,
+            child: SlideTransition(
+              position: Tween<Offset>(
+                      begin: const Offset(0.04, 0), end: Offset.zero)
+                  .animate(anim),
+              child: child,
+            ),
+          ),
+          child: _showSearch
+              ? TextField(
+                  key: const ValueKey('search'),
+                  controller: _searchCtrl,
+                  autofocus: true,
+                  style: const TextStyle(
+                      color: AppColors.text, fontSize: 17),
+                  decoration: InputDecoration(
+                    hintText: s['search_hint'],
+                    hintStyle: const TextStyle(color: AppColors.textFaint),
+                    border: InputBorder.none,
+                  ),
+                  onChanged: (v) => setState(() => _query = v),
+                )
+              : Align(
+                  key: const ValueKey('title'),
+                  alignment: Alignment.centerLeft,
+                  child: Text(s['nav_anime']),
                 ),
-                onChanged: (v) => setState(() => _query = v),
-              )
-            : Text(s['nav_anime'],
-                style: const TextStyle(
-                    color: Colors.white, fontWeight: FontWeight.bold)),
+        ),
         actions: [
           IconButton(
-            icon: Icon(_showSearch ? Icons.close : Icons.search,
-                color: Colors.white70),
+            icon: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 200),
+              transitionBuilder: (child, anim) => RotationTransition(
+                turns: Tween<double>(begin: 0.75, end: 1).animate(anim),
+                child: FadeTransition(opacity: anim, child: child),
+              ),
+              child: Icon(_showSearch ? Icons.close : Icons.search,
+                  key: ValueKey(_showSearch)),
+            ),
             onPressed: () => setState(() {
               _showSearch = !_showSearch;
               if (!_showSearch) {
@@ -86,24 +109,24 @@ class _AnimeListScreenState extends State<AnimeListScreen> {
             }),
           ),
           IconButton(
-            icon: const Icon(Icons.upload_file, color: Colors.white70),
+            icon: const Icon(Icons.upload_file),
             tooltip: s['tooltip_export'],
             onPressed: () async {
               await store.exportToFile();
               if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(s['export_done'])));
+                ScaffoldMessenger.of(context)
+                    .showSnackBar(SnackBar(content: Text(s['export_done'])));
               }
             },
           ),
           IconButton(
-            icon: const Icon(Icons.download, color: Colors.white70),
+            icon: const Icon(Icons.download),
             tooltip: s['tooltip_import'],
             onPressed: () async {
               await store.importFromFile();
               if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(s['import_done'])));
+                ScaffoldMessenger.of(context)
+                    .showSnackBar(SnackBar(content: Text(s['import_done'])));
               }
             },
           ),
@@ -113,7 +136,7 @@ class _AnimeListScreenState extends State<AnimeListScreen> {
         children: [
           if (store.tags.isNotEmpty)
             SizedBox(
-              height: 44,
+              height: 48,
               child: ListView(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 scrollDirection: Axis.horizontal,
@@ -121,26 +144,16 @@ class _AnimeListScreenState extends State<AnimeListScreen> {
                   final sel = _filterTagIds.contains(tag.id);
                   return Padding(
                     padding: const EdgeInsets.only(right: 8),
-                    child: FilterChip(
-                      label: Text(tag.name,
-                          style: TextStyle(
-                              color: sel ? Color(tag.color) : Colors.white54,
-                              fontSize: 12,
-                              fontWeight: sel
-                                  ? FontWeight.w600
-                                  : FontWeight.normal)),
-                      selected: sel,
-                      onSelected: (v) => setState(() => v
-                          ? _filterTagIds.add(tag.id)
-                          : _filterTagIds.remove(tag.id)),
-                      backgroundColor: const Color(0xFF1A1A2E),
-                      selectedColor: Color(tag.color).withOpacity(0.15),
-                      checkmarkColor: Color(tag.color),
-                      side: BorderSide(
-                          color: sel
-                              ? Color(tag.color).withOpacity(0.5)
-                              : Colors.white12),
-                      showCheckmark: false,
+                    child: Center(
+                      child: SelectableTagChip(
+                        label: tag.name,
+                        color: Color(tag.color),
+                        selected: sel,
+                        fontSize: 12.5,
+                        onTap: () => setState(() => sel
+                            ? _filterTagIds.remove(tag.id)
+                            : _filterTagIds.add(tag.id)),
+                      ),
                     ),
                   );
                 }).toList(),
@@ -148,26 +161,29 @@ class _AnimeListScreenState extends State<AnimeListScreen> {
             ),
           Expanded(
             child: filtered.isEmpty
-                ? Center(
-                    child: Text(
-                      store.anime.isEmpty
-                          ? s['list_empty']
-                          : s['list_nothing_found'],
-                      style: const TextStyle(color: Colors.white38),
-                    ),
+                ? EmptyState(
+                    icon: store.anime.isEmpty
+                        ? Icons.movie_filter_outlined
+                        : Icons.search_off_rounded,
+                    text: store.anime.isEmpty
+                        ? s['list_empty']
+                        : s['list_nothing_found'],
                   )
                 : ListView.builder(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.fromLTRB(16, 10, 16, 96),
                     itemCount: filtered.length,
-                    itemBuilder: (ctx, i) => AnimeCard(item: filtered[i]),
+                    itemBuilder: (ctx, i) => FadeSlideIn(
+                      key: ValueKey(filtered[i].id),
+                      index: i,
+                      child: AnimeCard(item: filtered[i]),
+                    ),
                   ),
           ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => openEditSheet(context, null, store),
-        backgroundColor: const Color(0xFF7C3AED),
-        child: const Icon(Icons.add, color: Colors.white),
+        child: const Icon(Icons.add_rounded, size: 28),
       ),
     );
   }
